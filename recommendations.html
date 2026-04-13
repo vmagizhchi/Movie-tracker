@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discover</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    if (localStorage.getItem("darkMode") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">&#x1F3AC;</div>
+        Movie Tracker
+      </a>
+      <nav>
+        <a href="index.html"           class="nav-link">&#x1F3E0; Home</a>
+        <a href="recommendations.html" class="nav-link" id="nav-recs">&#x1F3AC; Discover</a>
+        <a href="watchlist.html"       class="nav-link">&#x1F4CB; Watchlist</a>
+        <a href="history.html"         class="nav-link">&#x1F550; History</a>
+      </nav>
+      <button class="dark-toggle" id="dark-btn" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <div class="page-header">
+      <h1>Discover Movies</h1>
+      <p>Hover a card: <strong>&#x2713;</strong> marks it watched &middot; <strong>+</strong> saves it to your watchlist.</p>
+    </div>
+
+    <!-- ── Search Bar (NEW) ── -->
+    <!-- Filters the grid in real-time as you type — no page reload needed. -->
+    <div class="search-bar">
+      <input
+        type="text"
+        id="search-input"
+        class="search-input"
+        placeholder="&#x1F50D; Search by title or genre..."
+        oninput="renderRecsPage()"
+      />
+    </div>
+
+    <div class="movie-grid movie-grid-wide" id="recs-grid"></div>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>Your personal cinema journal.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById("nav-recs").classList.add("active");
+
+    function renderRecsPage() {
+      const state = getState();
+
+      // Read the search box value (empty string if the box doesn't exist yet)
+      const query = (document.getElementById("search-input")?.value || "").toLowerCase();
+
+      // Filter recommendations by title OR genre — case-insensitive
+      const filtered = state.recommendations.filter((m) =>
+        m.title.toLowerCase().includes(query) ||
+        m.genre.toLowerCase().includes(query)
+      );
+
+      // true at the end = show the new "+" Add to Watchlist button
+      renderGrid(filtered, "recs-grid", true, false, true);
+    }
+
+    window.renderCurrentPage = renderRecsPage;
+    renderRecsPage();
+  </script>
+
+</body>
+</html>

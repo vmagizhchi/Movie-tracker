@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+    <script>
+    if (localStorage.getItem("darkMode") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">&#x1F3AC;</div>
+        Movie Tracker
+      </a>
+      <nav>
+        <a href="index.html"           class="nav-link" id="nav-home">&#x1F3E0; Home</a>
+        <a href="recommendations.html" class="nav-link" id="nav-recs">&#x1F3AC; Discover</a>
+        <a href="watchlist.html"       class="nav-link" id="nav-wl">&#x1F4CB; Watchlist</a>
+        <a href="history.html"         class="nav-link" id="nav-hist">&#x1F550; History</a>
+      </nav>
+      
+      <button class="dark-toggle" id="dark-btn" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <!-- Main Banner -->
+    <section class="hero">
+      <h1>Welcome back to your <span>personal cinema.</span></h1>
+      <p>Keep track of what you've seen, discover what to watch next, and curate your perfect list.</p>
+    </section>
+
+   
+    <div id="stats-root"></div>
+
+    <!-- Recommendations preview -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          Recommendations
+          <span class="section-count" id="rec-count">0</span>
+        </h2>
+        <a href="recommendations.html" class="see-all">See all</a>
+      </div>
+      <div class="movie-grid" id="rec-grid"></div>
+    </section>
+
+    <!-- Watchlist preview -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          Your Watchlist
+          <span class="section-count" id="wl-count">0</span>
+        </h2>
+        <a href="watchlist.html" class="see-all">See all</a>
+      </div>
+      <div class="movie-grid" id="wl-grid"></div>
+    </section>
+
+    <!-- History preview -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          Recently Watched
+          <span class="section-count" id="hist-count">0</span>
+        </h2>
+        <a href="history.html" class="see-all">See all</a>
+      </div>
+      <div class="movie-grid" id="hist-grid"></div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>Your personal cinema journal.</p>
+  </footer>
+
+  
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+  
+  <script>
+    document.getElementById("nav-home").classList.add("active");
+
+    function renderHomePage() {
+      const state = getState();
+
+      const recs = state.recommendations.slice(0, 4);
+      document.getElementById("rec-count").textContent =
+        state.recommendations.length > 4 ? "4+" : state.recommendations.length;
+      // false for showAddWatchlist on home preview (keep it simple)
+      renderGrid(recs, "rec-grid", true, false, false);
+
+      const wl = state.watchlist.slice(0, 4);
+      document.getElementById("wl-count").textContent =
+        state.watchlist.length > 4 ? "4+" : state.watchlist.length;
+      renderGrid(wl, "wl-grid", true, true, false);
+
+      const hist = state.history.slice(0, 4);
+      document.getElementById("hist-count").textContent =
+        state.history.length > 4 ? "4+" : state.history.length;
+      renderGrid(hist, "hist-grid", false, false, false);
+    }
+
+    window.renderCurrentPage = renderHomePage;
+    renderHomePage();
+  </script>
+
+  <!-- ── React (loaded via CDN — no build step needed) ── -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+   <script type="text/babel">
+    // ── React Stats Panel ─────────────────────────────────────────────────────
+    // A simple functional component. It receives the app state as props and
+    // displays three stat cards. React manages the rendering — we just describe
+    // what the UI should look like.
+
+    function StatsPanel({ state }) {
+      const watched  = state.history.length;
+      const inList   = state.watchlist.length;
+      const avgRating =
+        watched > 0
+          ? (state.history.reduce((sum, m) => sum + m.rating, 0) / watched).toFixed(1)
+          : "—";
+
+      return (
+        <div className="stats-panel">
+          <div className="stat-card">
+            <div className="stat-number">{watched}</div>
+            <div className="stat-label">Movies Watched</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{inList}</div>
+            <div className="stat-label">In Watchlist</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">&#x2B50; {avgRating}</div>
+            <div className="stat-label">Avg Rating</div>
+          </div>
+        </div>
+      );
+    }
+
+    // Create the React root once, then call refreshStats() to re-render.
+    // window.refreshStats is called by markAsWatched / addToWatchlist in app.js
+    // so the stats stay in sync after every action.
+    const statsRoot = ReactDOM.createRoot(document.getElementById("stats-root"));
+
+    window.refreshStats = function () {
+      statsRoot.render(<StatsPanel state={getState()} />);
+    };
+
+    // Initial render
+    window.refreshStats();
+  </script>
+
+</body>
+</html>

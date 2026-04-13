@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watch History</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    if (localStorage.getItem("darkMode") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">&#x1F3AC;</div>
+        Movie Tracker
+      </a>
+      <nav>
+        <a href="index.html"           class="nav-link">&#x1F3E0; Home</a>
+        <a href="recommendations.html" class="nav-link">&#x1F3AC; Discover</a>
+        <a href="watchlist.html"       class="nav-link">&#x1F4CB; Watchlist</a>
+        <a href="history.html"         class="nav-link" id="nav-hist">&#x1F550; History</a>
+      </nav>
+      <button class="dark-toggle" id="dark-btn" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <div class="page-header">
+      <h1>Watch History</h1>
+      <p>Everything you have already watched, most recent first.</p>
+    </div>
+
+    <div class="movie-grid movie-grid-wide" id="hist-grid"></div>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>Your personal cinema journal.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById("nav-hist").classList.add("active");
+
+    function renderHistoryPage() {
+      const state = getState();
+      renderGrid(state.history, "hist-grid", false, false, false);
+    }
+
+    window.renderCurrentPage = renderHistoryPage;
+    renderHistoryPage();
+  </script>
+
+</body>
+</html>
